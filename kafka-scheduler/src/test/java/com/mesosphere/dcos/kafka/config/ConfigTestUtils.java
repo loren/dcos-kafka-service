@@ -1,5 +1,6 @@
 package com.mesosphere.dcos.kafka.config;
 
+import org.apache.mesos.config.RepairConfiguration;
 import com.mesosphere.dcos.kafka.test.KafkaTestUtils;
 
 public class ConfigTestUtils {
@@ -46,11 +47,20 @@ public class ConfigTestUtils {
         );
     }
 
+    public static RepairConfiguration getTestRepairConfiguration() {
+        return new RepairConfiguration(
+                5,
+                30,
+                true
+        );
+    }
+
     public static KafkaSchedulerConfiguration getTestKafkaSchedulerConfiguration() {
         return new KafkaSchedulerConfiguration(
                 getTestServiceConfiguration(),
                 getTestBrokerConfiguration(),
                 getTestKafkaConfiguration(),
-                getTestExecutorConfiguration());
+                getTestExecutorConfiguration(),
+                getTestRepairConfiguration());
     }
 }

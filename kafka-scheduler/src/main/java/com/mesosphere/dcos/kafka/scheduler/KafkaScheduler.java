@@ -3,11 +3,23 @@ package com.mesosphere.dcos.kafka.scheduler;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.mesos.config.RepairConfiguration;
 import com.mesosphere.dcos.kafka.config.ConfigStateUpdater;
 import com.mesosphere.dcos.kafka.plan.KafkaUpdatePhase;
 import com.mesosphere.dcos.kafka.state.ClusterState;
+import com.mesosphere.dcos.kafka.repair.KafkaRepairOfferRequirementProvider;
+import org.apache.mesos.scheduler.repair.RepairScheduler;
+import org.apache.mesos.scheduler.repair.RepairOfferRequirementProvider;
+import org.apache.mesos.scheduler.repair.RepairStatus;
+import org.apache.mesos.scheduler.repair.constrain.LaunchConstrainer;
+import org.apache.mesos.scheduler.repair.constrain.TimedLaunchConstrainer;
+import org.apache.mesos.scheduler.repair.monitor.FailureMonitor;
+import org.apache.mesos.scheduler.repair.monitor.NeverFailureMonitor;
+import org.apache.mesos.scheduler.repair.monitor.TimedFailureMonitor;
 import io.dropwizard.setup.Environment;
 
 import org.apache.commons.logging.Log;
@@ -52,11 +64,12 @@ public class KafkaScheduler implements Scheduler, Runnable {
   private final ClusterState clusterState;
 
   private final DefaultStageScheduler stageScheduler;
-  private final KafkaRepairScheduler repairScheduler;
+  private final RepairScheduler repairScheduler;
 
   private final OfferAccepter offerAccepter;
   private final Reconciler reconciler;
   private final StageManager stageManager;
+  private final AtomicReference<RepairStatus> repairStatusRef;
   private SchedulerDriver driver;
   private static final Integer restartLock = 0;
   private static List<TaskID> tasksToRestart = new ArrayList<>();
@@ -108,11 +121,28 @@ public class KafkaScheduler implements Scheduler, Runnable {
     stageManager = new DefaultStageManager(stage, getPhaseStrategyFactory(envConfig));
 
     stageScheduler = new DefaultStageScheduler(offerAccepter);
-    repairScheduler = new KafkaRepairScheduler(
-        configState.getTargetName().toString(),
-        frameworkState,
-        offerRequirementProvider,
-        offerAccepter);
+    RepairOfferRequirementProvider repairOfferRequirementProvider =
+            new KafkaRepairOfferRequirementProvider(offerRequirementProvider,
+                    frameworkState.getStateStore(),
+                    envConfig.getServiceConfiguration());
+    repairStatusRef = new AtomicReference<>(new RepairStatus(Collections.emptyList(), Collections.emptyList()));
+    RepairConfiguration repairConfig = envConfig.getRepairConfiguration();
+    LaunchConstrainer constrainer = new TimedLaunchConstrainer(repairConfig.getRepairDelaySecs());
+    FailureMonitor monitor = repairConfig.isReplacementEnabled() ?
+            new TimedFailureMonitor(repairConfig.getGracePeriodMins())
+            :
+            new NeverFailureMonitor();
+    repairScheduler = new RepairScheduler(
+            configState.getTargetName().toString(),
+            frameworkState.getStateStore(),
+            frameworkState::deleteTask,
+            repairOfferRequirementProvider,
+            offerAccepter,
+            //new KafkaRepairTestConstrainer(),
+            //new KafkaRepairTestMonitor(),
+            constrainer,
+            monitor,
+            repairStatusRef);
   }
 
   private static PhaseStrategyFactory getPhaseStrategyFactory(KafkaSchedulerConfiguration config) {
@@ -427,5 +457,9 @@ public class KafkaScheduler implements Scheduler, Runnable {
 
   public StageManager getStageManager() {
     return stageManager;
+  }
+
+  public AtomicReference<RepairStatus> getRepairStatusRef() {
+    return repairStatusRef;
   }
 }

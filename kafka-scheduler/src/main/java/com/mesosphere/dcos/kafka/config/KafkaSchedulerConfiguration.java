@@ -11,6 +11,7 @@ import org.apache.mesos.config.ConfigStoreException;
 import org.apache.mesos.config.Configuration;
 import org.apache.mesos.config.ConfigurationFactory;
 import org.apache.mesos.dcos.DcosConstants;
+import org.apache.mesos.config.RepairConfiguration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -35,19 +36,24 @@ public class KafkaSchedulerConfiguration implements Configuration {
     @JsonProperty("executor")
     private ExecutorConfiguration executorConfiguration;
 
+    @JsonProperty("repair")
+    private RepairConfiguration repairConfiguration;
+
     public KafkaSchedulerConfiguration() {
     }
 
     @JsonCreator
     public KafkaSchedulerConfiguration(
-            @JsonProperty("service")ServiceConfiguration serviceConfiguration,
-            @JsonProperty("broker")BrokerConfiguration brokerConfiguration,
-            @JsonProperty("kafka")KafkaConfiguration kafkaConfiguration,
-            @JsonProperty("executor")ExecutorConfiguration executorConfiguration) {
+            @JsonProperty("service") ServiceConfiguration serviceConfiguration,
+            @JsonProperty("broker") BrokerConfiguration brokerConfiguration,
+            @JsonProperty("kafka") KafkaConfiguration kafkaConfiguration,
+            @JsonProperty("executor") ExecutorConfiguration executorConfiguration,
+            @JsonProperty("repair") RepairConfiguration repairConfiguration) {
         this.serviceConfiguration = serviceConfiguration;
         this.brokerConfiguration = brokerConfiguration;
         this.kafkaConfiguration = kafkaConfiguration;
         this.executorConfiguration = executorConfiguration;
+        this.repairConfiguration = repairConfiguration;
     }
 
     public ServiceConfiguration getServiceConfiguration() {
@@ -61,6 +67,27 @@ public class KafkaSchedulerConfiguration implements Configuration {
 
     public BrokerConfiguration getBrokerConfiguration() {
         return brokerConfiguration;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        KafkaSchedulerConfiguration that = (KafkaSchedulerConfiguration) o;
+        return Objects.equals(serviceConfiguration, that.serviceConfiguration) &&
+                Objects.equals(brokerConfiguration, that.brokerConfiguration) &&
+                Objects.equals(kafkaConfiguration, that.kafkaConfiguration) &&
+                Objects.equals(executorConfiguration, that.executorConfiguration) &&
+                Objects.equals(repairConfiguration, that.repairConfiguration);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(serviceConfiguration, brokerConfiguration, kafkaConfiguration, executorConfiguration, repairConfiguration);
     }
 
     @JsonProperty("broker")
@@ -86,6 +113,15 @@ public class KafkaSchedulerConfiguration implements Configuration {
         this.executorConfiguration = executorConfiguration;
     }
 
+    public RepairConfiguration getRepairConfiguration() {
+        return repairConfiguration;
+    }
+
+    @JsonProperty("repair")
+    public void setRepairConfiguration(RepairConfiguration repairConfiguration) {
+        this.repairConfiguration = repairConfiguration;
+    }
+
     public ZookeeperConfiguration getZookeeperConfig() {
         ZookeeperConfiguration zkSettings = new ZookeeperConfiguration(
                 getKafkaConfiguration(), getServiceConfiguration());
@@ -107,29 +143,8 @@ public class KafkaSchedulerConfiguration implements Configuration {
                 ", brokerConfiguration=" + brokerConfiguration +
                 ", kafkaConfiguration=" + kafkaConfiguration +
                 ", executorConfiguration=" + executorConfiguration +
+                ", repairConfiguration=" + repairConfiguration +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        KafkaSchedulerConfiguration that = (KafkaSchedulerConfiguration) o;
-        return Objects.equals(serviceConfiguration, that.serviceConfiguration) &&
-                Objects.equals(brokerConfiguration, that.brokerConfiguration) &&
-                Objects.equals(executorConfiguration, that.executorConfiguration) &&
-                Objects.equals(kafkaConfiguration, that.kafkaConfiguration);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(serviceConfiguration, brokerConfiguration, kafkaConfiguration, executorConfiguration);
     }
 
     @Override

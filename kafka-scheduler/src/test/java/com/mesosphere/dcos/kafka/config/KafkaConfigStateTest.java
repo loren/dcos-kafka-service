@@ -1,5 +1,6 @@
 package com.mesosphere.dcos.kafka.config;
 
+import org.apache.mesos.config.RepairConfiguration;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.test.TestingServer;
@@ -39,7 +40,8 @@ public class KafkaConfigStateTest {
                 new ServiceConfiguration(),
                 new BrokerConfiguration(),
                 new KafkaConfiguration(),
-                new ExecutorConfiguration());
+                new ExecutorConfiguration(),
+                new RepairConfiguration());
     }
 
     @Test(expected=ConfigStoreException.class)

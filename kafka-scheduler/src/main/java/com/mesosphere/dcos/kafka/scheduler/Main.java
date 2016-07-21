@@ -4,6 +4,8 @@ import com.mesosphere.dcos.kafka.config.DropwizardConfiguration;
 import com.mesosphere.dcos.kafka.state.ClusterState;
 import com.mesosphere.dcos.kafka.web.BrokerCheck;
 import com.mesosphere.dcos.kafka.web.BrokerController;
+import com.mesosphere.dcos.kafka.web.*;
+import org.apache.mesos.scheduler.repair.RepairResource;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableLookup;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -111,6 +113,7 @@ public final class Main extends Application<DropwizardConfiguration> {
     environment.jersey().register(new TopicController(
             new CmdExecutor(configuration.getSchedulerConfiguration(), kafkaState),
             kafkaState));
+    environment.jersey().register(new RepairResource(kafkaScheduler.getRepairStatusRef()));
 
     // APIs from dcos-commons:
     environment.jersey().register(new ConfigResource<>(
