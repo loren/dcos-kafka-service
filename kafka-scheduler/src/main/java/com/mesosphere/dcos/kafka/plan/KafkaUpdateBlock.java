@@ -117,6 +117,7 @@ public class KafkaUpdateBlock implements Block {
   public void forceComplete() {
     try {
       KafkaScheduler.rescheduleTask(state.getTaskIdForBroker(getBrokerId()));
+      setStatus(Status.Complete);
     } catch (Exception ex) {
       log.error("Failed to force completion of Block: " + getId() + "with exception: ", ex);
       return;

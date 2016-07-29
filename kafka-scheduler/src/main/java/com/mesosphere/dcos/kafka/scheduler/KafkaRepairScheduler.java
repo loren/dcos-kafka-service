@@ -1,8 +1,10 @@
 package com.mesosphere.dcos.kafka.scheduler;
 
+import com.mesosphere.dcos.kafka.config.ServiceConfiguration;
 import com.mesosphere.dcos.kafka.offer.KafkaOfferRequirementProvider;
 import com.mesosphere.dcos.kafka.offer.OfferUtils;
 import com.mesosphere.dcos.kafka.plan.KafkaUpdateBlock;
+import com.mesosphere.dcos.kafka.plan.KafkaUpdatePhase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mesos.Protos.Offer;
@@ -12,6 +14,7 @@ import org.apache.mesos.SchedulerDriver;
 import com.mesosphere.dcos.kafka.state.FrameworkState;
 import org.apache.mesos.offer.*;
 import org.apache.mesos.scheduler.plan.Block;
+import org.apache.mesos.scheduler.plan.Phase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,21 +27,29 @@ public class KafkaRepairScheduler {
   private final FrameworkState frameworkState;
   private final OfferAccepter offerAccepter;
   private final KafkaOfferRequirementProvider offerReqProvider;
+  private final ServiceConfiguration serviceConfiguration;
 
   public KafkaRepairScheduler(
-    String targetConfigName,
-    FrameworkState frameworkState,
-    KafkaOfferRequirementProvider offerReqProvider,
-    OfferAccepter offerAccepter) {
+          String targetConfigName,
+          FrameworkState frameworkState,
+          KafkaOfferRequirementProvider offerReqProvider,
+          OfferAccepter offerAccepter,
+          ServiceConfiguration serviceConfiguration) {
     this.targetConfigName = targetConfigName;
     this.frameworkState = frameworkState;
     this.offerReqProvider = offerReqProvider;
     this.offerAccepter = offerAccepter;
+    this.serviceConfiguration = serviceConfiguration;
   }
 
-  public List<OfferID> resourceOffers(SchedulerDriver driver, List<Offer> offers, Block block)
+  public List<OfferID> resourceOffers(SchedulerDriver driver, List<Offer> offers, Phase updatePhase, Block block)
       throws Exception {
-    List<OfferID> acceptedOffers = new ArrayList<OfferID>();
+    List<OfferID> acceptedOffers = new ArrayList<>();
+
+    if (!(updatePhase instanceof KafkaUpdatePhase)) {
+      return acceptedOffers;
+    }
+
     List<TaskInfo> terminatedTasks = getTerminatedTasks(block);
 
     OfferRequirement offerReq = null;
@@ -47,10 +58,12 @@ public class KafkaRepairScheduler {
       TaskInfo terminatedTask = terminatedTasks.get(new Random().nextInt(terminatedTasks.size()));
       offerReq = offerReqProvider.getReplacementOfferRequirement(terminatedTask);
     } else {
-      List<Integer> missingBrokerIds = getMissingBrokerIds(block);
+      List<Integer> missingBrokerIds = getMissingBrokerIds();
       log.info("Missing brokerIds: " + missingBrokerIds);
-      if (missingBrokerIds.size() > 0) {
-        Integer brokerId = missingBrokerIds.get(new Random().nextInt(missingBrokerIds.size()));
+      List<Integer> recoverableBrokerIds = getRecoverableBrokerIds(missingBrokerIds, updatePhase, block);
+      log.info("Recoverable brokerIds: " + recoverableBrokerIds);
+      if (recoverableBrokerIds.size() > 0) {
+        Integer brokerId = missingBrokerIds.get(new Random().nextInt(recoverableBrokerIds.size()));
         offerReq = offerReqProvider.getNewOfferRequirement(targetConfigName, brokerId);
       }
     }
@@ -62,6 +75,25 @@ public class KafkaRepairScheduler {
     }
 
     return acceptedOffers;
+  }
+
+  private List<Integer> getRecoverableBrokerIds(List<Integer> missingBrokerIds, Phase updatePhase, Block block) {
+    List<Integer> recoverableBrokerIds = new ArrayList<>();
+    for (Block pBlock : updatePhase.getBlocks()) {
+      if (block != null && pBlock.getId().equals(block.getId())) {
+        continue;
+      }
+
+      if (pBlock instanceof KafkaUpdateBlock) {
+        Integer pBlockId = ((KafkaUpdateBlock) pBlock).getBrokerId();
+        if (missingBrokerIds.contains(pBlockId) && pBlock.isComplete()) {
+          recoverableBrokerIds.add(pBlockId);
+      }
+
+      }
+    }
+
+    return recoverableBrokerIds;
   }
 
   private List<TaskInfo> getTerminatedTasks(Block block) {
@@ -85,10 +117,10 @@ public class KafkaRepairScheduler {
     return filteredTerminatedTasks;
   }
 
-  private List<Integer> getMissingBrokerIds(Block block) {
+  private List<Integer> getMissingBrokerIds() {
     List<Integer> missingBrokerIds = new ArrayList<>();
 
-    Integer lastExpectedBrokerId = getLastExpectedBrokerId(block);
+    Integer lastExpectedBrokerId = getLastExpectedBrokerId();
 
     if (!(lastExpectedBrokerId >= 0)) {
       return missingBrokerIds;
@@ -104,10 +136,7 @@ public class KafkaRepairScheduler {
 
     for (Integer i = 0; i <= lastExpectedBrokerId; i++) {
       if (!brokerExists(brokerTasks, i)) {
-        String brokerName = OfferUtils.idToName(i);
-        if (block == null || !brokerName.equals(block.getName())) {
-          missingBrokerIds.add(i);
-        }
+        missingBrokerIds.add(i);
       }
     }
 
@@ -126,20 +155,7 @@ public class KafkaRepairScheduler {
     return false;
   }
 
-  private Integer getLastExpectedBrokerId(Block block) {
-    if (block == null) {
-      try {
-        return frameworkState.getTaskInfos().size() - 1;
-      } catch (Exception ex) {
-        log.error("Failed to fetch TaskInfos with exception: " + ex);
-        return -1;
-      }
-    } else if (block instanceof KafkaUpdateBlock) {
-      int brokerId = ((KafkaUpdateBlock)block).getBrokerId();
-      return brokerId - 1;
-    } else {
-      // Reconciliation block
-      return -1;
-    }
+  private Integer getLastExpectedBrokerId() {
+    return serviceConfiguration.getCount() - 1;
   }
 }

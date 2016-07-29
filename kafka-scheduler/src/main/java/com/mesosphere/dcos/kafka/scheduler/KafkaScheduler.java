@@ -112,7 +112,8 @@ public class KafkaScheduler implements Scheduler, Runnable {
         configState.getTargetName().toString(),
         frameworkState,
         offerRequirementProvider,
-        offerAccepter);
+        offerAccepter,
+        envConfig.getServiceConfiguration());
   }
 
   private static PhaseStrategyFactory getPhaseStrategyFactory(KafkaSchedulerConfiguration config) {
@@ -233,7 +234,7 @@ public class KafkaScheduler implements Scheduler, Runnable {
         }
         List<Offer> unacceptedOffers = filterAcceptedOffers(offers, acceptedOffers);
         try {
-          acceptedOffers.addAll(repairScheduler.resourceOffers(driver, unacceptedOffers, block));
+          acceptedOffers.addAll(repairScheduler.resourceOffers(driver, unacceptedOffers, stageManager.getCurrentPhase(), block));
         } catch (InvalidRequirementException e) {
           log.error("Error repairing block: " + block + " Reason: " + e);
         }
