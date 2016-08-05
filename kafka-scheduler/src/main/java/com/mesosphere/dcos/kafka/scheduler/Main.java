@@ -4,7 +4,6 @@ import com.mesosphere.dcos.kafka.config.DropwizardConfiguration;
 import com.mesosphere.dcos.kafka.state.ClusterState;
 import com.mesosphere.dcos.kafka.web.BrokerCheck;
 import com.mesosphere.dcos.kafka.web.BrokerController;
-import com.mesosphere.dcos.kafka.web.*;
 import org.apache.mesos.scheduler.repair.RepairResource;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableLookup;

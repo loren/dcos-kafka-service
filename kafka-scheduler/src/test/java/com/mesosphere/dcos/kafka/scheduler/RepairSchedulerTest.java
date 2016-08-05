@@ -7,7 +7,6 @@ import com.mesosphere.dcos.kafka.repair.KafkaRepairOfferRequirementProvider;
 import com.mesosphere.dcos.kafka.state.ClusterState;
 import com.mesosphere.dcos.kafka.test.KafkaTestUtils;
 import org.apache.mesos.dcos.Capabilities;
-import org.apache.mesos.dcos.DcosCluster;
 import org.apache.mesos.scheduler.repair.*;
 import org.apache.mesos.scheduler.repair.constrain.LaunchConstrainer;
 import org.apache.mesos.scheduler.repair.constrain.TestingLaunchConstrainer;
