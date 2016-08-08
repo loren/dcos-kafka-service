@@ -1,6 +1,5 @@
 package com.mesosphere.dcos.kafka.offer;
 
-import com.google.common.base.Joiner;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.TextFormat;
 import com.mesosphere.dcos.kafka.commons.KafkaTask;
@@ -316,15 +315,8 @@ public class PersistentOfferRequirementProvider implements KafkaOfferRequirement
     String principal = config.getServiceConfiguration().getPrincipal();
     String frameworkName = config.getServiceConfiguration().getName();
 
-    List<String> commands = new ArrayList<>();
-    commands.add("export PATH=$(ls -d $MESOS_SANDBOX/jre*/bin):$PATH"); // find directory that starts with "jre" containing "bin"
-    commands.add("$MESOS_SANDBOX/overrider/bin/kafka-config-overrider server $MESOS_SANDBOX/overrider/conf/scheduler.yml");
     final KafkaConfiguration kafkaConfiguration = config.getKafkaConfiguration();
-    commands.add(String.format(
-        "exec $MESOS_SANDBOX/%1$s/bin/kafka-server-start.sh " +
-        "$MESOS_SANDBOX/%1$s/config/server.properties ",
-        kafkaConfiguration.getKafkaVerName()));
-    final String kafkaLaunchCommand = Joiner.on(" && ").join(commands);
+    final String kafkaLaunchCommand = "echo 'hello world' >> $MESOS_SANDBOX/hello_world.txt";
 
     log.info("Configuring kafkaLaunchCommand as: " + kafkaLaunchCommand);
 
