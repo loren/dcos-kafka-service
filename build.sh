@@ -48,23 +48,12 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# CLI (Go):
-
-cd cli/ && ./build-cli.sh
-if [ $? -ne 0 ]; then
-    _notify_github failure "CLI build failed"
-    exit 1
-fi
 cd $REPO_ROOT_DIR
 
 _notify_github success "Build succeeded"
 
 ./dcos-commons/tools/ci-upload.sh \
-  kafka \
+  hello \
   universe/ \
   kafka-scheduler/build/distributions/*.zip \
-  kafka-executor/build/distributions/*.zip \
-  cli/dcos-kafka/dcos-kafka-darwin \
-  cli/dcos-kafka/dcos-kafka-linux \
-  cli/dcos-kafka/dcos-kafka.exe \
-  cli/python/dist/*.whl
+  kafka-executor/build/distributions/*.zip

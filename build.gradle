@@ -21,7 +21,6 @@ allprojects {
 }
 
 ext {
-  cliVersion = "0.2.5"
   serviceVersion = "0.10.0.0"
 }
 
@@ -75,8 +74,4 @@ subprojects {
       html.destination "${buildDir}/jacoco"
     }
   }
-}
-
-task cliVersion << {
-  print cliVersion
 }

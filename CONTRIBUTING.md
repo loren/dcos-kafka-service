@@ -22,17 +22,6 @@ cd dcos-kafka-service
 ./gradlew clean check build
 ```
 
-#### Build CLI
-
-Prerequisites:
-- Go 1.5+ with `GOPATH` defined
-
-``` bash
-cd cli/
-./build-cli.sh
-./dcos-kafka/dcos-kafka-linux kafka -h
-```
-
 ### Unit Test
 
 ``` bash
