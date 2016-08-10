@@ -46,5 +46,5 @@ dcos package install hello-world
 If you're testing a config change that you want to be in effect at framework launch:
 
 ``` bash
-dcos package install kafka options=/path/to/options.json
+dcos package install hello-world options=/path/to/options.json
 ```
