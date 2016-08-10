@@ -28,7 +28,6 @@ schedulerConfiguration:
     diskType: ${DISK_TYPE:-ROOT}
     javaUri: ${JAVA_URI}
     kafkaUri: ${KAFKA_URI}
-    overriderUri: ${OVERRIDER_URI}
     port: ${BROKER_PORT:-0}
 
   kafka:

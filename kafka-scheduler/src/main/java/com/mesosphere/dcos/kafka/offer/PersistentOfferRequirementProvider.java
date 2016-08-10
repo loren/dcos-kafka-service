@@ -344,7 +344,6 @@ public class PersistentOfferRequirementProvider implements KafkaOfferRequirement
       .addEnvironmentVar("JAVA_HOME", "jre1.8.0_91")
       .addUri(brokerConfig.getJavaUri())
       .addUri(brokerConfig.getKafkaUri())
-      .addUri(brokerConfig.getOverriderUri())
       .addUri(executorConfig.getExecutorUri());
 
     // Build Executor
