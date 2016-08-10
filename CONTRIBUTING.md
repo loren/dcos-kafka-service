@@ -39,12 +39,12 @@ Prerequisites:
 Get the link to the Universe zip (e.g. from the "upload" step of your PR's build). With that in hand:
 
 ``` bash
-dcos package repo add --index=0 repo-name https://uri.to.build/universe-name.zip
-dcos package install hello-world
+dcos package repo add --index=0 hello-dev https://uri.to.build/universe-name.zip
+dcos package install hello
 ```
 
 If you're testing a config change that you want to be in effect at framework launch:
 
 ``` bash
-dcos package install hello-world options=/path/to/options.json
+dcos package install hello options=/path/to/options.json
 ```

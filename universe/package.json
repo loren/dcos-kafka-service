@@ -1,6 +1,6 @@
 {
   "packagingVersion": "2.0",
-  "name": "hello-world",
+  "name": "hello",
   "version": "{{package-version}}",
   "maintainer": "support@mesosphere.io",
   "description": "Hello world running on DC/OS",

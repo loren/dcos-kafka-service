@@ -342,8 +342,6 @@ public class PersistentOfferRequirementProvider implements KafkaOfferRequirement
     CommandInfoBuilder executorCommandBuilder = new CommandInfoBuilder()
       .setCommand(executorCommand)
       .addEnvironmentVar("JAVA_HOME", "jre1.8.0_91")
-      .addUri(brokerConfig.getJavaUri())
-      .addUri(brokerConfig.getKafkaUri())
       .addUri(executorConfig.getExecutorUri());
 
     // Build Executor
