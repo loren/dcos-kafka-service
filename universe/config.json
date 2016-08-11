@@ -6,14 +6,14 @@
         "description": "DC/OS service configuration properties",
         "properties":{
           "name" : {
-            "description":"The name of the Kafka service instance",
+            "description":"The name of the Hello service instance",
             "type":"string",
-            "default":"kafka"
+            "default":"hello"
           },
           "principal": {
-            "description": "The principal for the Kafka service instance.",
+            "description": "The principal for the Hello service instance.",
             "type": "string",
-            "default": "kafka-principal"
+            "default": "hello-principal"
           },
           "secret_name": {
             "description": "Name of the Secret Store credentials to use for DC/OS service authentication. This should be left empty unless service authentication is needed.",
@@ -120,7 +120,7 @@
         ]
       },
       "kafka":{
-        "description":"Kafka service configuration properties",
+        "description":"Hello service configuration properties",
         "type":"object",
         "additionalProperties":false,
         "properties":{
