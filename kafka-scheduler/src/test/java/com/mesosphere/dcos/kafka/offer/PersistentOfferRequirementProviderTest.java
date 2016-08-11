@@ -116,11 +116,8 @@ public class PersistentOfferRequirementProviderTest {
     final ExecutorInfo executorInfo = req.getExecutorRequirement().getExecutorInfo();
 
     CommandInfo cmd = executorInfo.getCommand();
-    Assert.assertEquals(4, cmd.getUrisList().size());
-    Assert.assertEquals(KafkaTestUtils.testJavaUri, cmd.getUrisList().get(0).getValue());
-    Assert.assertEquals(KafkaTestUtils.testKafkaUri, cmd.getUrisList().get(1).getValue());
-    Assert.assertEquals(KafkaTestUtils.testOverriderUri, cmd.getUrisList().get(2).getValue());
-    Assert.assertEquals(KafkaTestUtils.testExecutorUri, cmd.getUrisList().get(3).getValue());
+    Assert.assertEquals(1, cmd.getUrisList().size());
+    Assert.assertEquals(KafkaTestUtils.testExecutorUri, cmd.getUrisList().get(0).getValue());
 
     String portString = String.valueOf(portsResource.getRanges().getRangeList().get(0).getBegin());
 
@@ -160,8 +157,8 @@ public class PersistentOfferRequirementProviderTest {
       }
     }
 
-    Assert.assertEquals(286, kafkaTaskData.getValue().length());
-    Assert.assertEquals(83, cmd.getValue().length());
+    Assert.assertEquals("echo 'hello world' >> $MESOS_SANDBOX/hello_world.txt", kafkaTaskData.getValue());
+    Assert.assertEquals("./executor/bin/kafka-executor -Dlogback.configurationFile=executor/conf/logback.xml", cmd.getValue());
   }
 
   @Test

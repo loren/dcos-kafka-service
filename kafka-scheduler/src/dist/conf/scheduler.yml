@@ -8,6 +8,11 @@ schedulerConfiguration:
     principal: ${FRAMEWORK_PRINCIPAL}
     count: ${BROKER_COUNT:-3}
 
+  recovery:
+    min_delay_between_repairs_secs: 60
+    repair_in_place_grace_period_mins: 15
+    enable_replacement: false
+
   executor:
     cpus: ${EXECUTOR_CPUS:-0.5}
     mem: ${EXECUTOR_MEM:-256}
@@ -23,7 +28,6 @@ schedulerConfiguration:
     diskType: ${DISK_TYPE:-ROOT}
     javaUri: ${JAVA_URI}
     kafkaUri: ${KAFKA_URI}
-    overriderUri: ${OVERRIDER_URI}
     port: ${BROKER_PORT:-0}
 
   kafka:

@@ -22,17 +22,6 @@ cd dcos-kafka-service
 ./gradlew clean check build
 ```
 
-#### Build CLI
-
-Prerequisites:
-- Go 1.5+ with `GOPATH` defined
-
-``` bash
-cd cli/
-./build-cli.sh
-./dcos-kafka/dcos-kafka-linux kafka -h
-```
-
 ### Unit Test
 
 ``` bash
@@ -50,12 +39,12 @@ Prerequisites:
 Get the link to the Universe zip (e.g. from the "upload" step of your PR's build). With that in hand:
 
 ``` bash
-dcos package repo add --index=0 repo-name https://uri.to.build/universe-name.zip
-dcos package install kafka
+dcos package repo add --index=0 hello-dev https://uri.to.build/universe-name.zip
+dcos package install hello
 ```
 
 If you're testing a config change that you want to be in effect at framework launch:
 
 ``` bash
-dcos package install kafka options=/path/to/options.json
+dcos package install hello options=/path/to/options.json
 ```
