@@ -28,9 +28,7 @@
     "BROKER_PORT": "{{brokers.port}}",
     "DISK_TYPE": "{{brokers.disk_type}}",
     "KAFKA_VER_NAME": "kafka_2.11-0.10.0.0",
-    "KAFKA_URI": "{{resource.assets.uris.kafka_tgz}}",
     "EXECUTOR_URI": "{{resource.assets.uris.executor-zip}}",
-    "JAVA_URI": "{{resource.assets.uris.jre-tar-gz}}",
     "KAFKA_ZOOKEEPER_URI" : "{{kafka.kafka_zookeeper_uri}}",
     "KAFKA_ADVERTISE_HOST_IP" : "{{kafka.kafka_advertise_host_ip}}",
     "KAFKA_OVERRIDE_RESERVED_BROKER_MAX_ID": "{{kafka.reserved_broker_max_id}}",
@@ -135,9 +133,7 @@
   },
   {{/service.secret_name}}
   "uris": [
-    "{{resource.assets.uris.jre-tar-gz}}",
-    "{{resource.assets.uris.scheduler-zip}}",
-    "{{resource.assets.uris.kafka_tgz}}"
+    "{{resource.assets.uris.scheduler-zip}}"
   ],
   "healthChecks": [
     {
