@@ -159,7 +159,7 @@ public class PersistentOfferRequirementProviderTest {
       }
     }
 
-    Assert.assertEquals("echo 'hello world' >> $MESOS_SANDBOX/hello_world.txt", kafkaTaskData.getValue());
+    Assert.assertEquals("while true; do echo `date`': hello' >> $MESOS_SANDBOX/hello_world.txt; sleep 60; done", kafkaTaskData.getValue());
     Assert.assertEquals("./executor/bin/kafka-executor -Dlogback.configurationFile=executor/conf/logback.xml", cmd.getValue());
   }
 

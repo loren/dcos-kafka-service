@@ -46,7 +46,7 @@ public final class Main extends Application<DropwizardConfiguration> {
 
   @Override
   public String getName() {
-    return "DCOS Kafka Service";
+    return "DCOS Hello";
   }
 
   @Override

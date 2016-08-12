@@ -316,7 +316,7 @@ public class PersistentOfferRequirementProvider implements KafkaOfferRequirement
     String frameworkName = config.getServiceConfiguration().getName();
 
     final KafkaConfiguration kafkaConfiguration = config.getKafkaConfiguration();
-    final String kafkaLaunchCommand = "echo 'hello world' >> $MESOS_SANDBOX/hello_world.txt";
+    final String kafkaLaunchCommand = "while true; do echo `date`': hello' >> $MESOS_SANDBOX/hello_world.txt; sleep 60; done";
 
     log.info("Configuring kafkaLaunchCommand as: " + kafkaLaunchCommand);
 
