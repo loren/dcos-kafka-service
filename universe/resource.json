@@ -1,6 +1,7 @@
 {
   "assets": {
     "uris": {
+      "jre-tar-gz": "https://s3-us-west-2.amazonaws.com/infinity-artifacts/kafka/jre-8u91-linux-x64.tar.gz",
       "scheduler-zip": "{{artifact-dir}}/scheduler.zip",
       "executor-zip": "{{artifact-dir}}/executor.zip"
     }

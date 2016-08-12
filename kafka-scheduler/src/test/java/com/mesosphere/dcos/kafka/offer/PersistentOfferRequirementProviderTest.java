@@ -116,8 +116,10 @@ public class PersistentOfferRequirementProviderTest {
     final ExecutorInfo executorInfo = req.getExecutorRequirement().getExecutorInfo();
 
     CommandInfo cmd = executorInfo.getCommand();
-    Assert.assertEquals(1, cmd.getUrisList().size());
-    Assert.assertEquals(KafkaTestUtils.testExecutorUri, cmd.getUrisList().get(0).getValue());
+    Assert.assertEquals(2, cmd.getUrisList().size());
+
+    Assert.assertEquals(KafkaTestUtils.testJavaUri, cmd.getUrisList().get(0).getValue());
+    Assert.assertEquals(KafkaTestUtils.testExecutorUri, cmd.getUrisList().get(1).getValue());
 
     String portString = String.valueOf(portsResource.getRanges().getRangeList().get(0).getBegin());
 
